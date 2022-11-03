@@ -63,9 +63,33 @@ public class TestTeleOp extends LinearOpMode {
         final int intakeLowered = -390;
         final int armRaised = 750;
 
-        while (opModeIsActive()) {
-            //Testing Bucket
+        boolean[] driveControls;
+        boolean[] armControls=new boolean[10];
 
+        while (opModeIsActive()) {
+            //// Scheme for Drive Control Map { 0: intake motor on/off, 1: carousel counterclockwise, 2: carousel clockwise, 3: intake
+            //// 4: strafe up, 5: strafe down, 6: strafe left, 7: strafe right, 8: pivot turn left, 9: pivot turn right }
+
+            // Default:
+            driveControls=new boolean[]{gamepad1.a,gamepad1.b,gamepad1.x,gamepad1.y,
+                    gamepad1.dpad_up,gamepad1.dpad_down,gamepad1.dpad_left,gamepad1.dpad_right,
+                    gamepad1.left_bumper,gamepad1.right_bumper};
+
+            //// Scheme for Arm Control Map {}
+            ////
+            // Default:
+            armControls[0]=gamepad1.a;
+            armControls[1]=gamepad1.b;
+            armControls[2]=gamepad1.x;
+            armControls[3]=gamepad1.y;
+            armControls[4]=gamepad1.dpad_up;
+            armControls[5]=gamepad1.dpad_down;
+            armControls[6]=gamepad1.dpad_left;
+            armControls[7]=gamepad1.dpad_right;
+            armControls[8]=gamepad1.left_bumper;
+            armControls[9]=gamepad1.right_bumper;
+
+            //Testing Bucket
             int intakeMotorRotationCurrentPos = robot.intakeMotorRotation.getCurrentPosition();
             //int LinSlidesDriveCurrentPos = robot.linearSlidesDrive.getCurrentPosition();
             //JN: Can probably be deleted
@@ -77,7 +101,7 @@ public class TestTeleOp extends LinearOpMode {
             telemetry.addData("Bucket Servo:  ", robot.bucketTiltServo.getPosition());
 
             // Intake Pseudocode
-            /**
+            /*
              * int get position
              *if intakeToggle is false and gamepad1.y is pressed:
              * intakeToggle = true
@@ -94,15 +118,15 @@ public class TestTeleOp extends LinearOpMode {
              * intakeMotorRotation.set(0)
              */
             // Intake
-            if (gamepad1.y && !previousY) {
+            if (driveControls[3] && !previousY) {
                 intakeToggle = !intakeToggle;
             }
             previousY = !intakeToggle;
 
-            if (!intakeToggle && gamepad1.y && intakeMotorRotationCurrentPos >= 0) {
+            if (!intakeToggle && driveControls[3] && intakeMotorRotationCurrentPos >= 0) {
                 intakeToggle = true;
             }
-            if (intakeToggle && gamepad1.y && intakeMotorRotationCurrentPos <= intakeLowered) {
+            if (intakeToggle && driveControls[3] && intakeMotorRotationCurrentPos <= intakeLowered) {
                 intakeToggle = false;
             }
 
@@ -110,7 +134,7 @@ public class TestTeleOp extends LinearOpMode {
                 robot.intakeMotorRotation.setPower(-0.3);
             } else if (intakeMotorRotationCurrentPos <= intakeLowered && intakeToggle) {
                 robot.intakeMotorRotation.setPower(0);
-                if (gamepad1.a) {
+                if (driveControls[0]) {
                     robot.intakeMotorPower.setPower(1);
                 } else{
                     robot.intakeMotorPower.setPower(-1);
@@ -118,12 +142,12 @@ public class TestTeleOp extends LinearOpMode {
             }
             if (!intakeToggle && intakeMotorRotationCurrentPos < 110) {
                 robot.intakeMotorRotation.setPower(0.3);
-            } else if (!intakeToggle && intakeMotorRotationCurrentPos >= 110) {
+            } else if (!intakeToggle) {
                 robot.intakeMotorRotation.setPower(0);
                 robot.intakeMotorPower.setPower(0);
             }
 
-            if (intakeToggle && !gamepad1.a) {
+            if (intakeToggle && !driveControls[0]) {
                 robot.intakeMotorPower.setPower(-1);
             } else if (intakeToggle && gamepad1.a) {
                 robot.intakeMotorPower.setPower(1);
@@ -132,9 +156,9 @@ public class TestTeleOp extends LinearOpMode {
             }
 
             // Carousel(Duck) Motor
-            if (gamepad1.b) {
+            if (driveControls[1]) {
                 robot.carouselMotor.setPower(-1);
-            } else if(gamepad1.x){
+            } else if(driveControls[2]){
                 robot.carouselMotor.setPower(1);
             }
             else {
@@ -185,7 +209,7 @@ public class TestTeleOp extends LinearOpMode {
             double rightRatio = 0.5 - (0.5 * rotate);
             double leftRatio = 0.5 + (0.5 * rotate);
             //Declares the maximum power any side can have
-            double maxRatio = 1;
+            double maxRatio;
 
             //If we're turning left, the right motor should be at maximum power, so it decides the maxRatio. If we're turning right, vice versa.
             if (rotate < 0) {
@@ -205,9 +229,9 @@ public class TestTeleOp extends LinearOpMode {
             robot.LBMotor.setPower(-powL * accel);
 
 
-            robot.pivotTurn(1, gamepad1.left_bumper, gamepad1.right_bumper);
+            robot.pivotTurn(1, driveControls[8], driveControls[9]);
             //Strafing controls (thanks Nick)
-            robot.octoStrafe(gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.dpad_left, gamepad1.dpad_right);
+            robot.octoStrafe(driveControls[4], driveControls[5], driveControls[6], driveControls[7]);
             telemetry.update();
 
         }
