@@ -30,169 +30,147 @@ public class TestTeleOp extends LinearOpMode {
 
         //Stuff Done
 
-        //y - Lower Intake(toggle)
-        //a - bucket drop
-        //b -  motor
-        //rb/lb  - change robot heading
-        //right stick L/R/F/B - Strafe
-        //trigger left - rotate output out
-        //trigger right - rotate output in
-        //Drive and Steer - F/B/L/R left stick
-
         //drive controls
         double accel;
         double rotate;
         double powR;
         double powL;
+        boolean strafeL;
+        boolean strafeR;
 
         double maxPower = 0.05;
 
         //intake
-        boolean intakeActive = false;
+        boolean clawActive = false;
 
-        boolean previousY = false;
+        boolean previousClaw = false;
         int intakeTarget = 0;
         double intakeDrivePower = -1;
         //robot.linearSlidesDrive.resetEncoder();
 
-        boolean intakeToggle = false;
+        boolean clawToggle = false;
         double servoPos = robot.bucketTiltServo.getPosition();
         boolean inversed = false;
 
-        //MAGIC NUMBERS
-        final int intakeLowered = -390;
+        // TODO: CHANGE MAGIC NUMBERS BASED ON READOUTS
+        // none of these are currently correct
+        final int clawOpen = -390;
         final int armRaised = 750;
+        final int high = 0;
+        final int mid = 0;
+        final int low = 0;
+        final int ground = 0;
+        
+        // KEYBIND MAPS
+        //// 0: Turn Left, 1: Turn Right, 2: Turn Either, 3: Strafe Left, 4: Strafe Right, 5: Strafe L/R, 6: Drive Forward, 7: Drive Backward, 8: Drive Either, 9: Slow Forward, 10: Slow Backward
+        //// 11: Power Left, 12: Power Right, 13: Increase Speed, 14: Decrease Speed, 15: Brake, 16: Strafe Forward, 17: Strafe Back, 18: Strafe F/B
+        String[] driveAndrew = new String[]{null,null,null,"x","b",null,null,null,null,null,null,"joystick-l-y","joystick-r-y",null,null,null,null,null,null};
+        String[] driveGautam = new String[]{null,null,"joystick-l-x","joystick-r-x","joystick-r-x","joystick-r-x",null,null,"joystick-l-y",null,null,null,null,null,null,null,null,null,null};
+        String[] driveKrish = new String[]{null,null,"joystick-r-x","joystick-l-x","joystick-l-x","joystick-l-x",null,null,null,null,null,null,null,"trigger-l","trigger-r","b",null,null,null};
+        String[] driveNoam = new String[]{null,null,"bumper","dpad-l","dpad-r",null,"trigger-r","trigger-l",null,"y","a","x","b",null,null,null,null,null,null,null,null};
 
-        boolean[] driveControls;
-        boolean[] armControls=new boolean[10];
+        //// 0: Arm Up, 1: Arm Down, 2: Open Claw, 3: Half Claw, 4: Close Claw, 5: Toggle Claw, 6: Claw Fix, 7: Preset High
+        //// 8: Preset Mid, 9: Preset Low, 10: Preset Ground
+        String[] armAndrew = new String[]{"y","a","bumper-r",null,"bumper-l",null,null,null,null,null,null};
+        String[] armGautam = new String[]{"joystick-l","joystick-r","bumper-r",null,"bumper-l",null,null,null,null,null,null};
+        String[] armKrish = new String[]{"trigger-r","trigger-l",null,null,null,"bumper-r","bumper-l","y","x","b","a"};
+        String[] armNoam = new String[]{"trigger-l","trigger-r","a","y","x",null,null,null,null,null,null};
 
+        ////// Set Driver and Arm operator prior to match
+        String[] currentDrive = driveNoam;
+        String[] currentArm = armAndrew;
         while (opModeIsActive()) {
-            //// Scheme for Drive Control Map { 0: intake motor on/off, 1: carousel counterclockwise, 2: carousel clockwise, 3: intake
-            //// 4: strafe up, 5: strafe down, 6: strafe left, 7: strafe right, 8: pivot turn left, 9: pivot turn right }
-
-            // Default:
-            driveControls=new boolean[]{gamepad1.a,gamepad1.b,gamepad1.x,gamepad1.y,
-                    gamepad1.dpad_up,gamepad1.dpad_down,gamepad1.dpad_left,gamepad1.dpad_right,
-                    gamepad1.left_bumper,gamepad1.right_bumper};
-
-            //// Scheme for Arm Control Map {}
-            ////
-            // Default:
-            armControls[0]=gamepad1.a;
-            armControls[1]=gamepad1.b;
-            armControls[2]=gamepad1.x;
-            armControls[3]=gamepad1.y;
-            armControls[4]=gamepad1.dpad_up;
-            armControls[5]=gamepad1.dpad_down;
-            armControls[6]=gamepad1.dpad_left;
-            armControls[7]=gamepad1.dpad_right;
-            armControls[8]=gamepad1.left_bumper;
-            armControls[9]=gamepad1.right_bumper;
 
             //Testing Bucket
-            int intakeMotorRotationCurrentPos = robot.intakeMotorRotation.getCurrentPosition();
+            int clawMotorRotationCurrentPos = robot.intakeMotorRotation.getCurrentPosition();
+            int armMotorRotationCurrentPos = robot.armRotation.getCurrentPosition();
             //int LinSlidesDriveCurrentPos = robot.linearSlidesDrive.getCurrentPosition();
             //JN: Can probably be deleted
 
-            telemetry.addData("intakePos: ", robot.intakeMotorRotation.getCurrentPosition());
-            telemetry.addData("targetPos: ", intakeTarget);
-//            telemetry.addData("intakeVelocity: ", robot.intakeMotorRotation.getVelocity());
-            telemetry.addData("arm rotation: ", robot.armRotation.getCurrentPosition());
-            telemetry.addData("Bucket Servo:  ", robot.bucketTiltServo.getPosition());
+//            telemetry.addData("intakePos: ", robot.intakeMotorRotation.getCurrentPosition());
+//            telemetry.addData("targetPos: ", intakeTarget);
+////            telemetry.addData("intakeVelocity: ", robot.intakeMotorRotation.getVelocity());
+//            telemetry.addData("arm rotation: ", robot.armRotation.getCurrentPosition());
+//            telemetry.addData("Bucket Servo:  ", robot.bucketTiltServo.getPosition());
 
             // Intake Pseudocode
             /*
              * int get position
-             *if intakeToggle is false and gamepad1.y is pressed:
-             * intakeToggle = true
-             *if intakeToggle is true and gamepad1.y is pressed:
-             * intakeToggle = false
+             *if clawToggle is false and gamepad1.y is pressed:
+             * clawToggle = true
+             *if clawToggle is true and gamepad1.y is pressed:
+             * clawToggle = false
              *
-             *if intakeToggle is true and intakeMotorRotation's position is not -300
+             *if clawToggle is true and intakeMotorRotation's position is not -300
              * intakeMotorRotation.set(0.3)
-             *if intakeToggle is true and intakeMotorRotation's position is -300
+             *if clawToggle is true and intakeMotorRotation's position is -300
              * intakeMotorRotation.set(0)
-             *if intakeToggle is false and intakeMotorRotation's position is not 0
+             *if clawToggle is false and intakeMotorRotation's position is not 0
              * intakeMotorRotation.set(-0.5)
-             *if intakeToggle is false and intakeMotorRotation's position is 0
+             *if clawToggle is false and intakeMotorRotation's position is 0
              * intakeMotorRotation.set(0)
              */
-            // Intake
-            if (driveControls[3] && !previousY) {
-                intakeToggle = !intakeToggle;
-            }
-            previousY = !intakeToggle;
 
-            if (!intakeToggle && driveControls[3] && intakeMotorRotationCurrentPos >= 0) {
-                intakeToggle = true;
-            }
-            if (intakeToggle && driveControls[3] && intakeMotorRotationCurrentPos <= intakeLowered) {
-                intakeToggle = false;
-            }
+            // Claw
 
-            if (intakeToggle && intakeMotorRotationCurrentPos > intakeLowered) {
-                robot.intakeMotorRotation.setPower(-0.3);
-            } else if (intakeMotorRotationCurrentPos <= intakeLowered && intakeToggle) {
-                robot.intakeMotorRotation.setPower(0);
-                if (driveControls[0]) {
-                    robot.intakeMotorPower.setPower(1);
-                } else{
-                    robot.intakeMotorPower.setPower(-1);
-                }
+            //Claw Toggle
+            if (getControl(currentArm[5])>0 && !previousClaw) {
+                clawToggle = !clawToggle;
             }
-            if (!intakeToggle && intakeMotorRotationCurrentPos < 110) {
-                robot.intakeMotorRotation.setPower(0.3);
-            } else if (!intakeToggle) {
-                robot.intakeMotorRotation.setPower(0);
-                robot.intakeMotorPower.setPower(0);
+            previousClaw = !clawToggle;
+
+            if (!clawToggle && getControl(currentArm[5])>0 && clawMotorRotationCurrentPos >= 0) {
+                clawToggle = true;
+            }
+            if (clawToggle && getControl(currentArm[5])>0 && clawMotorRotationCurrentPos <= clawOpen) {
+                clawToggle = false;
             }
 
-            if (intakeToggle && !driveControls[0]) {
-                robot.intakeMotorPower.setPower(-1);
-            } else if (intakeToggle && gamepad1.a) {
-                robot.intakeMotorPower.setPower(1);
-            } else {
-                robot.intakeMotorPower.setPower(0);
+            //Claw Open
+            if (getControl(currentArm[2])>0 && clawMotorRotationCurrentPos >= 0){
+                //open claw
+            }
+            //Claw Halfway
+            if (getControl(currentArm[3])>0 && clawMotorRotationCurrentPos <= clawOpen/2) {
+                //half claw
+            }
+            //Close Claw
+            if (getControl(currentArm[4])>0 && clawMotorRotationCurrentPos <= clawOpen) {
+                //close claw
             }
 
-            // Carousel(Duck) Motor
-            if (driveControls[1]) {
-                robot.carouselMotor.setPower(-1);
-            } else if(driveControls[2]){
-                robot.carouselMotor.setPower(1);
+            // Arm
+
+            //Arm Up
+            if(getControl(currentArm[0])>0 && armMotorRotationCurrentPos<=armRaised){
+                //arm up
             }
-            else {
-                robot.carouselMotor.setPower(0);
+            //Arm Down
+            if(getControl(currentArm[1])>0 && armMotorRotationCurrentPos>0) {
+                //arm down
             }
 
-            //TODO: Output
-            if (gamepad1.left_trigger > 0.1) {
-                //Proportionality constant is a magic number
-                robot.armRotation.setPower(gamepad1.left_trigger * -.75);
-                if (robot.armRotation.getCurrentPosition() > armRaised){
-                    robot.armRotation.setPower(0);
-                }
-            } else if (gamepad1.right_trigger > 0.1) {
-                robot.armRotation.setPower(gamepad1.right_trigger * .5);
-            } else {
-                robot.armRotation.setPower(0);
+            // Arm Presets
+            if(getControl(currentArm[7])>0 && armMotorRotationCurrentPos != high){
+                armMotorRotationCurrentPos = high;
             }
-
-            // Bucket
-//            if(gamepad1.left_stick_button){
-//                servoPos = servoPos+.01;
-//            } else if (gamepad1.right_stick_button){
-//                servoPos = servoPos - .01;
-//            }
-//            robot.bucketTiltServo.turnToAngle(servoPos);
+            if(getControl(currentArm[8])>0 && armMotorRotationCurrentPos != mid){
+                armMotorRotationCurrentPos = mid;
+            }
+            if(getControl(currentArm[9])>0 && armMotorRotationCurrentPos != low){
+                armMotorRotationCurrentPos = low;
+            }
+            if(getControl(currentArm[10])>0 && armMotorRotationCurrentPos != ground){
+                armMotorRotationCurrentPos = ground;
+            }
 
             //Driving Code
 
             //Left Stick--Acceleration
-            accel = gamepad1.left_stick_y;
+            accel = getControl(currentDrive[8]);
 
             //Left Stick--Rotation
-            rotate = gamepad1.right_stick_x;
+            rotate = getControl(currentDrive[2]);
 
             //JN: Doesn't really handle simultaneous input well, if you want SOCD cleaning check for both buttons being pushed at the same time
 //            if (gamepad1.right_bumper){
@@ -229,11 +207,44 @@ public class TestTeleOp extends LinearOpMode {
             robot.LBMotor.setPower(-powL * accel);
 
 
-            robot.pivotTurn(1, driveControls[8], driveControls[9]);
+            robot.pivotTurn(1, getControl(currentDrive[0])>0, getControl(currentDrive[1])>0);
+            // Set Strafe with Joystick
+            if(getControl(currentDrive[3])==getControl(currentDrive[4])){
+                strafeL=getControl(currentDrive[5])>0;
+                strafeR=getControl(currentDrive[5])<0;
+            }
+            else{
+                strafeL=getControl(currentDrive[3])>0;
+                strafeR=getControl(currentDrive[4])>0;
+            }
             //Strafing controls (thanks Nick)
-            robot.octoStrafe(driveControls[4], driveControls[5], driveControls[6], driveControls[7]);
+            robot.octoStrafe(getControl(currentDrive[16])>0,getControl(currentDrive[17])>0,strafeL,strafeR);
             telemetry.update();
 
         }
+    }
+    public float getControl(String str){
+        switch(str) {
+            case "a": return gamepad1.a ? 1.0f : 0.0f;
+            case "b": return gamepad1.b ? 1.0f : 0.0f;
+            case "x": return gamepad1.x ? 1.0f : 0.0f;
+            case "y": return gamepad1.y ? 1.0f : 0.0f;
+            case "dpad-u": return gamepad1.dpad_up ? 1.0f : 0.0f;
+            case "dpad-d": return gamepad1.dpad_down ? 1.0f : 0.0f;
+            case "dpad-l": return gamepad1.dpad_left ? 1.0f : 0.0f;
+            case "dpad-r": return gamepad1.dpad_right ? 1.0f : 0.0f;
+            case "bumper-l": return gamepad1.left_bumper ? 1.0f : 0.0f;
+            case "bumper-r": return gamepad1.right_bumper ? 1.0f : 0.0f;
+            case "bumper": return (gamepad1.left_bumper ? 1.0f : 0.0f)-(gamepad1.right_bumper ? 1.0f : 0.0f);
+            case "trigger-l": return gamepad1.left_trigger;
+            case "trigger-r": return gamepad1.right_trigger;
+            case "joystick-l": return (gamepad1.left_stick_y > 0 || gamepad1.left_stick_y < 0) || (gamepad1.left_stick_x > 0 || gamepad1.left_stick_x < 0) ? 1.0f : 0.0f;
+            case "joystick-l-x": return gamepad1.left_stick_x;
+            case "joystick-l-y": return gamepad1.left_stick_y;
+            case "joystick-r": return (gamepad1.right_stick_y > 0 || gamepad1.right_stick_y < 0) || (gamepad1.right_stick_x > 0 || gamepad1.right_stick_x < 0) ? 1.0f : 0.0f;
+            case "joystick-r-x": return gamepad1.right_stick_x;
+            case "joystick-r-y": return gamepad1.right_stick_y;
+        }
+        return 0.0f;
     }
 }
