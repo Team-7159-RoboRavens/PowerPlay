@@ -95,7 +95,7 @@ public class AdapterKeybinds extends LinearOpMode {
         void claw();
     }
 
-    private ControlScheme[] control = new ControlScheme[] {
+    private final ControlScheme[] control = new ControlScheme[] {
         new ControlScheme(){
             public void drive(){
                 powL = gamepad1.left_stick_y;
