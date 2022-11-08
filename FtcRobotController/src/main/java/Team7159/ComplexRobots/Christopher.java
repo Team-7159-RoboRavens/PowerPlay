@@ -31,7 +31,7 @@ public class Christopher extends BasicMecanum {
     public DcMotor intakeMotorPower;
     public DcMotor intakeMotorRotation;
 
-    public Servo bucketTiltServo;
+    public Servo clawServo;
 
     public void init(HardwareMap Map) {
 
@@ -43,32 +43,33 @@ public class Christopher extends BasicMecanum {
         intakeMotorPower = Map.dcMotor.get("intakeMotorPower");
         intakeMotorRotation = Map.dcMotor.get("intakeMotorRotation");
 
-        bucketTiltServo = Map.servo.get("bucketTiltServo");
+        clawServo = Map.servo.get("clawServo");
 
-        armRotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armRotation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //linearSlidesDrive.setVeloCoefficients(0.8, 0, 0);
-        carouselMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        carouselMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //carouselMotor.setVeloCoefficients(0.8, 0, 0);
-        intakeMotorPower.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeMotorPower.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        intakeMotorRotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        // doesn't
-
+        intakeMotorRotation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        intakeMotorRotation.setVeloCoefficients(0.80, 0, 0);
         armRotation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotorPower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotorRotation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         armRotation.setPower(0);
+        armRotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         carouselMotor.setPower(0);
+        carouselMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         intakeMotorPower.setPower(0);
 
         intakeMotorRotation.setPower(0);
+        intakeMotorRotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        bucketTiltServo.scaleRange(0, 0.7);
-        bucketTiltServo.setPosition(0);
-
+        clawServo.scaleRange(0.0, 1.0);
+        clawServo.setPosition(0);
     }
 }

@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import Team7159.ComplexRobots.Christopher;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Test TeleOp")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="String Map")
 
-public class TestTeleOp extends LinearOpMode {
+public class StringMap extends LinearOpMode {
 
     public Christopher robot = new Christopher();
 
