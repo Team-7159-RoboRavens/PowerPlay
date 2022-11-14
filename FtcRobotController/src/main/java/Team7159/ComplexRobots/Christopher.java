@@ -1,3 +1,4 @@
+
 package Team7159.ComplexRobots;
 
 
@@ -30,19 +31,19 @@ public class Christopher extends BasicMecanum {
         super.init(Map);
 
         armMotor = Map.dcMotor.get("armMotor");
-//        servoClaw = Map.servo.get("servoClaw");
-//        servoArm2 = Map.servo.get("servoArm2");
+        servoClaw = Map.servo.get("servoClaw");
+        servoArm2 = Map.servo.get("servoArm2");
 
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setPower(0);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-//        servoClaw.scaleRange(0, 0.7);
-//        servoClaw.setPosition(0);
-//
-//        servoArm2.scaleRange(0, 0.7);
-//        servoArm2.setPosition(0);
+        servoClaw.scaleRange(0, 0.7);
+        servoClaw.setPosition(0);
+
+        servoArm2.scaleRange(0, 0.7);
+        servoArm2.setPosition(0);
 
     }
 
