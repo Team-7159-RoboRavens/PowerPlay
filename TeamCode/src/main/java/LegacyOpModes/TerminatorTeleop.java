@@ -106,7 +106,7 @@
 //            //TODO: add encoder value max and min to prevent failure
 ////            robot.linearSlidesRotate.set(0);
 ////            robot.linearSlidesDrive.set(0);
-//            robot.armRotation.set(0);
+//            robot.armMotor.set(0);
 //            if (gamepad1.left_trigger > 0.5) {
 ////                if (gamepad1.y) {
 ////                    robot.linearSlidesRotate.set(0);
@@ -121,7 +121,7 @@
 ////                if (robot.linearSlidesDrive.getCurrentPosition() > 100) {
 ////                    robot.linearSlidesDrive.set(linSlideDrivePower);
 ////                }
-//                robot.armRotation.set(0.15);
+//                robot.armMotor.set(0.15);
 //            } else if (gamepad1.right_trigger > 0.5) {
 ////                if (gamepad1.y) {
 ////                    robot.linearSlidesRotate.set(0);
@@ -134,9 +134,9 @@
 ////                    robot.linearSlidesDrive.set(-linSlideDrivePower);
 ////                }
 ////                robot.linearSlidesDrive.set(-linSlideDrivePower);
-//                robot.armRotation.set(-0.15);
+//                robot.armMotor.set(-0.15);
 //            }
-//            telemetry.addData("Linear Slide Power: ", robot.armRotation.getVelocity());
+//            telemetry.addData("Linear Slide Power: ", robot.armMotor.getVelocity());
 //            telemetry.addData("LTrigger: ", gamepad1.left_trigger);
 //            telemetry.addData("RTrigger: ", gamepad1.right_trigger);
 //

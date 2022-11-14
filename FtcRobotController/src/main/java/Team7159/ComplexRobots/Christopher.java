@@ -1,18 +1,3 @@
-//package Team7159.ComplexRobots;
-//
-//import com.arcrobotics.ftclib.hardware.ServoEx;
-//import com.arcrobotics.ftclib.hardware.SimpleServo;
-//import com.arcrobotics.ftclib.hardware.motors.Motor;
-//import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-//import com.qualcomm.robotcore.hardware.HardwareMap;
-//
-//import Team7159.BasicRobots.BasicMecanum;
-//
-//public class Christopher extends BasicMecanum {
-//
-//}
-
-
 package Team7159.ComplexRobots;
 
 
@@ -21,55 +6,149 @@ import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.hardware.motors.*;
 
 
-
 import Team7159.BasicRobots.BasicMecanum;
+import Team7159.Enums.Direction;
 
 public class Christopher extends BasicMecanum {
 
-    public DcMotor armRotation;
-    public DcMotor carouselMotor;
-    public DcMotor intakeMotorPower;
-    public DcMotor intakeMotorRotation;
+    public DcMotor armMotor;
+    public Servo servoClaw;
+    public Servo servoArm2;
 
-    public Servo clawServo;
+    public int armPosHigh = 10;
+    public int armPosMid = 5;
+    public int armPosLow = 1;
+    public int armPosGround = 0;
+
+    public int servoPosHigh = 10;
+    public int servoPosMid = 5;
+    public int servoPosLow = 1;
+    public int servoPosGround = 0;
 
     public void init(HardwareMap Map) {
 
         super.init(Map);
 
-        armRotation = Map.dcMotor.get("armRotation");
-        carouselMotor = Map.dcMotor.get("carouselMotor");
+        armMotor = Map.dcMotor.get("armMotor");
+//        servoClaw = Map.servo.get("servoClaw");
+//        servoArm2 = Map.servo.get("servoArm2");
 
-        intakeMotorPower = Map.dcMotor.get("intakeMotorPower");
-        intakeMotorRotation = Map.dcMotor.get("intakeMotorRotation");
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setPower(0);
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        clawServo = Map.servo.get("clawServo");
+//        servoClaw.scaleRange(0, 0.7);
+//        servoClaw.setPosition(0);
+//
+//        servoArm2.scaleRange(0, 0.7);
+//        servoArm2.setPosition(0);
 
-        armRotation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //linearSlidesDrive.setVeloCoefficients(0.8, 0, 0);
-        carouselMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //carouselMotor.setVeloCoefficients(0.8, 0, 0);
-        intakeMotorPower.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        intakeMotorRotation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        intakeMotorRotation.setVeloCoefficients(0.80, 0, 0);
-        armRotation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeMotorPower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeMotorRotation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        armRotation.setPower(0);
-        armRotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        carouselMotor.setPower(0);
-        carouselMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        intakeMotorPower.setPower(0);
-
-        intakeMotorRotation.setPower(0);
-        intakeMotorRotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        clawServo.scaleRange(0.0, 1.0);
-        clawServo.setPosition(0);
     }
+
+    // For Autos
+//    public void strafe(Direction direction, double power, double time) throws InterruptedException{
+//        if(direction == Direction.LEFT){
+//            LFMotor.setPower(-power);
+//            RFMotor.setPower(power);
+//            LBMotor.setPower(power);
+//            RBMotor.setPower(-power);
+//            wait((int)time * 1000);
+//            stop();
+//        }else if(direction == Direction.RIGHT){
+//            LFMotor.setPower(power);
+//            RFMotor.setPower(-power);
+//            LBMotor.setPower(-power);
+//            RBMotor.setPower(power);
+//            wait((int)time * 1000);
+//            stop();
+//        }
+//        else if(direction == Direction.FORWARDS) {
+//            LFMotor.setPower(power);
+//            RFMotor.setPower(power);
+//            LBMotor.setPower(power);
+//            RBMotor.setPower(power);
+//            wait((int) time * 1000);
+//            stop();
+//        }
+//        else if(direction == Direction.BACKWARDS) {
+//            LFMotor.setPower(-power);
+//            RFMotor.setPower(-power);
+//            LBMotor.setPower(-power);
+//            RBMotor.setPower(-power);
+//            wait((int) time * 1000);
+//            stop();
+//        }
+//        else{
+//            //Throw an exception
+//        }
+//    }
+
+    // Tile Version
+    public void strafe(Direction direction, double power, double tiles) throws InterruptedException{
+        int tileTime = 1000;
+        if(direction == Direction.LEFT){
+            LFMotor.setPower(-power);
+            RFMotor.setPower(power);
+            LBMotor.setPower(power);
+            RBMotor.setPower(-power);
+            Thread.sleep((long)tiles * tileTime);
+            stop();
+        }else if(direction == Direction.RIGHT){
+            LFMotor.setPower(power);
+            RFMotor.setPower(-power);
+            LBMotor.setPower(-power);
+            RBMotor.setPower(power);
+            Thread.sleep((long)tiles * tileTime);
+            stop();
+        }
+        else if(direction == Direction.FORWARDS) {
+            LFMotor.setPower(power);
+            RFMotor.setPower(power);
+            LBMotor.setPower(power);
+            RBMotor.setPower(power);
+            Thread.sleep((long) tiles * tileTime);
+            stop();
+        }
+        else if(direction == Direction.BACKWARDS) {
+            LFMotor.setPower(-power);
+            RFMotor.setPower(-power);
+            LBMotor.setPower(-power);
+            RBMotor.setPower(-power);
+            Thread.sleep((long) tiles * tileTime);
+            stop();
+        }
+        else{
+            //Throw an exception
+        }
+    }
+
+    // Rotate angle method
+    public void rotate(Direction direction, double power, double inputAngle) throws InterruptedException {
+        double time90 = 1000;
+        double angleTime = (inputAngle/90) * time90;
+
+        if(direction == Direction.LEFT) {
+            RFMotor.setPower(-power);
+            LFMotor.setPower(power);
+            RBMotor.setPower(-power);
+            LBMotor.setPower(power);
+            Thread.sleep((long) angleTime);
+        } else if(direction == Direction.RIGHT) {
+            RFMotor.setPower(power);
+            LFMotor.setPower(-power);
+            RBMotor.setPower(power);
+            LBMotor.setPower(-power);
+            Thread.sleep((long) angleTime);
+        }
+    }
+
+    // Method for arm pos
+    public void armPos(int armPos, int servoArmPos) {
+        armMotor.setPower(0.5);
+        armMotor.setTargetPosition(armPos);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        servoArm2.setPosition(servoArmPos);
+    }
+
 }
