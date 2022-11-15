@@ -30,7 +30,7 @@ public class EncoderRead extends BasicMecanum {
 
     public Servo flywheelServo;
     public Servo intakeServo;
-    public Servo clawServo;
+    public Servo servoClaw;
 
     public void init(HardwareMap Map) {
 
@@ -43,7 +43,7 @@ public class EncoderRead extends BasicMecanum {
         clawMotor = Map.dcMotor.get("clawMotor");
 
         flywheelServo = Map.servo.get("flywheelServo");
-        clawServo = Map.servo.get("clawServo");
+        servoClaw = Map.servo.get("servoClaw");
         intakeServo = Map.servo.get("intakeServo");
 
         flywheelMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
