@@ -21,13 +21,16 @@ public class Christopher extends BasicMecanum {
     public double armPosLow = 1;
     public double armPosGround = 0;
     public double armPosBack = 0;
-
     public double servoPosHigh = 1.0;
     public double servoPosMid = 0.9;
     public double servoPosLow = 0.7;
     public double servoPosGround = 0.5;
     public double servoPosBack = 1.0;
 
+    //TODO: Find new magic numbers
+    public int armPosGrab = 0;
+    public int armPosGnd = 0;
+    public int armPosL = 0;
 
     public double servoClawOpen = 0.95;
     public double servoClawGrab = 0.1;
