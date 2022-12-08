@@ -36,7 +36,11 @@ public class ArmTestTeleOp  extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Servo Pos: ", robot.servoClaw.getPosition());
             telemetry.addData("Strafe Mult: ", robot.mult);
-
+            telemetry.addData("LF Encoder:", robot.LFMotor.getCurrentPosition());
+            telemetry.addData("RF Encoder:", robot.RFMotor.getCurrentPosition());
+            telemetry.addData("LB Encoder: ", robot.LBMotor.getCurrentPosition());
+            telemetry.addData("RB Encoder: ", robot.RBMotor.getCurrentPosition());
+            telemetry.addData("Arm Encoder: ", robot.armMotor.getCurrentPosition());
             if(gamepad1.right_trigger > 0.1){
                 robot.armMotor.setPower(mult * gamepad2.right_trigger);
             } else if (gamepad2.left_trigger > 0.1) {
@@ -56,6 +60,13 @@ public class ArmTestTeleOp  extends LinearOpMode {
                 robot.mult += 0.1;
             } else if(gamepad1.b){
                 robot.mult -= 0.1;
+            }
+            
+            //set encoder on arm to 0 for magic numbers
+            if(gamepad1.right_stick_button){
+                robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                sleep(50);
+                robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
 
             //Driving code
